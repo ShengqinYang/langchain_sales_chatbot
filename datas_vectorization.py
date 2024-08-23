@@ -1,7 +1,7 @@
 import openai
 import pandas as pd
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain.vectorstores import FAISS, Pinecone
 from langchain.text_splitter import CharacterTextSplitter
 import configparser, os
 
@@ -68,6 +68,19 @@ def query_db(db_name, query):
             return d.page_content.split("：**")[-1]
     else:
         return "没有符合条件的回答"
+    
+    # db = Pinecone.load_local(db_name, OpenAIEmbeddings())
+    # retriever = db.as_retriever(
+    #     search_type="similarity_score_threshold",
+    #     search_kwargs={"score_threshold": 0.8, 'k': 1, "fetch_k": 2}  # 按相关性去查找, k默认返回几条
+
+    # )
+    # docs = retriever.get_relevant_documents(query)
+    # if docs:
+    #     for d in docs:
+    #         return d.page_content.split("：**")[-1]
+    # else:
+    #     return "没有符合条件的回答"
 
 
 def main(file_name, db_name, split_str):

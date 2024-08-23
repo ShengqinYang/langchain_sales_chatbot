@@ -125,7 +125,8 @@ class SalesChatbot(object):
             if check_answer.get("keys") == "不确定":
                 search_api_answer = self.use_search_api(message)  # 功能：答案不确定时，使用搜索引擎
                 # TODO 搜索结果的正确的待验证
-                relevance_answer = self.check_topic_relevance(message, search_api_answer)  # 功能：搜索结果如果跟本小助手有高相关性 则将Q&A加到向量数据库里
+                relevance_answer = self.check_topic_relevance(message,
+                                                              search_api_answer)  # 功能：搜索结果如果跟本小助手有高相关性 则将Q&A加到向量数据库里
                 if relevance_answer.get("keys") == "是":
                     self.add_qa(message, search_api_answer)
                 return search_api_answer
@@ -137,17 +138,28 @@ class SalesChatbot(object):
             return f"作为一个{config.title}，我暂时不知道这个问题的答案，但是我会继续努力学习的～"
 
     def launch_gradio(self, config: SalesConfig):
-        demo = gr.ChatInterface(
-            fn=self.sales_boot,
-            title=config.title,
-            description=config.description,
-            examples=config.examples,
-            # retry_btn=None,
-            # undo_btn=None,
-            chatbot=gr.Chatbot(height=600),
-        )
+        files_type = ["txt", "word"]
+        # demo = gr.Interface(
+        #     fn=self.sales_boot,
+        #     title=config.title,
+        #     description=config.description,
+        #     examples=config.examples,
+        #     # retry_btn=None,
+        #     # undo_btn=None,
+        #     # chatbot=gr.Chatbot(height=600),
+        # )
+        #
+        # demo.launch(share=True, server_name="0.0.0.0")
 
-        demo.launch(share=True, server_name="0.0.0.0")
+        with gr.Blocks() as demo:
+            gr.Markdown("Start typing below and then click **Run** to see the output.")
+            with gr.Row():
+                inp = gr.Textbox(placeholder="What is your name?")
+                out = gr.Textbox()
+            btn = gr.Button("Run")
+            btn.click(fn=self.sales_boot, inputs=inp, outputs=out)
+
+        demo.launch()
 
 
 if __name__ == "__main__":
